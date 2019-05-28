@@ -60,9 +60,9 @@ local function OnEnter(self)
 		if slots[i] then
 			local item = GetInventoryItemID("player", i)
 			if item then
-				local _, _, quality, iLevel, _, _, _, _, _, _, _ = GetItemInfo(item)
+				local name, _, quality, _, _, _, _, _, _, _, _ = GetItemInfo(item)
 				local red, green, blue, _ = GetItemQualityColor(quality)
-				DT.tooltip:AddDoubleLine(slots[i], iLevel, 1, 1, 1, red, green, blue)
+				DT.tooltip:AddDoubleLine(slots[i], E.db.ilvldt.showItem == true and ("%s (%d)"):format(name, GetDetailedItemLevelInfo(GetInventoryItemLink("player", i))) or GetDetailedItemLevelInfo(GetInventoryItemLink("player", i)), 1, 1, 1, red, green, blue)
 			end
 		end
 	end
@@ -86,6 +86,7 @@ E["valueColorUpdateFuncs"][ValueColorUpdate] = true
 P["ilvldt"] = {
 	["ilvl"] = "equip",
 	["precision"] = 2,
+	["showItem"] = true,
 }
 
 local function InjectOptions()
@@ -132,6 +133,12 @@ local function InjectOptions()
 				name = L["Precision"],
 				desc = L["Number of decimal places to round to for the average item level."],
 				min = 0, max = 5, step = 1,
+			},
+			showItem = {
+				type = "toggle",
+				order = 6,
+				name = L["Show Item Name"],
+				desc = L["Show item name in the tooltip."],
 			},
 		},
 	}
