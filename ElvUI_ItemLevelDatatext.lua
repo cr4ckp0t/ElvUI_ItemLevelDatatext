@@ -57,13 +57,10 @@ local function OnEnter(self)
 	DT.tooltip:AddDoubleLine(L["Equipped"], DecRound(equipped, E.db.ilvldt.precision), 1, 1, 1, 1, 1, 0)
 	DT.tooltip:AddLine(" ")
 	for i = 1, 17 do
-		if slots[i] then
-			local item = GetInventoryItemID("player", i)
-			if item then
-				local name, _, quality, _, _, _, _, _, _, _, _ = GetItemInfo(item)
-				local red, green, blue, _ = GetItemQualityColor(quality)
-				DT.tooltip:AddDoubleLine(slots[i], E.db.ilvldt.showItem == true and ("%s (%d)"):format(name, GetDetailedItemLevelInfo(GetInventoryItemLink("player", i))) or GetDetailedItemLevelInfo(GetInventoryItemLink("player", i)), 1, 1, 1, red, green, blue)
-			end
+		if slots[i] and GetInventoryItemID("player", i) then
+			local name, _, quality, _, _, _, _, _, _, _, _ = GetItemInfo(GetInventoryItemLink("player", i))
+			local red, green, blue, _ = GetItemQualityColor(quality)
+			DT.tooltip:AddDoubleLine(slots[i], E.db.ilvldt.showItem == true and ("%s (%d)"):format(name, GetDetailedItemLevelInfo(GetInventoryItemLink("player", i))) or GetDetailedItemLevelInfo(GetInventoryItemLink("player", i)), 1, 1, 1, red, green, blue)
 		end
 	end
 	DT.tooltip:Show()
