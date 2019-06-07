@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- ElvUI_ItemLevelDatatext By Lockslap (US, Bleeding Hollow)
+-- ElvUI_ItemLevelDatatext By Crackpotx (US, Lightbringer)
 -------------------------------------------------------------------------------
 local debug = false
 --@debug@
@@ -22,7 +22,7 @@ L["Main Hand"] = true
 L["Neck"] = true
 L["Number of decimal places to round to for the average item level."] = true
 L["Off Hand"] = true
-L["Plugins by |cff9382c9Lockslap|r"] = true
+L["Plugins by |cff9382c9Crackpotx|r"] = true
 L["Precision"] = true
 L["Ranged"] = true
 L["Ring 1"] = true
@@ -31,7 +31,7 @@ L["Select which item level you want to display in the datatext, total or equippe
 L["Shoulders"] = true
 L["Show Item Name"] = true
 L["Show item name in the tooltip."] = true
-L["Thanks for using and supporting my work!  -- |cff9382c9Lockslap|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."] = true
+L["Thanks for using and supporting my work!  -- |cff9382c9Crackpotx|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."] = true
 L["Total"] = true
 L["Trinket 1"] = true
 L["Trinket 2"] = true

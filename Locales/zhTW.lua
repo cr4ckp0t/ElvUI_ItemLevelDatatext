@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- ElvUI Item Level Datatext By Lockslap (US, Bleeding Hollow)
+-- ElvUI Item Level Datatext By Crackpotx (US, Lightbringer)
 -------------------------------------------------------------------------------
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ElvUI_ItemLevelDatatext", "zhTW", false)

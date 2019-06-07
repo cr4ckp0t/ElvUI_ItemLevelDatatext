@@ -1,11 +1,20 @@
 -------------------------------------------------------------------------------
--- ElvUI Item Level Datatext By Lockslap
+-- ElvUI Item Level Datatext By Crackpotx
 -------------------------------------------------------------------------------
 local E, _, V, P, G, _ = unpack(ElvUI)
 local DT = E:GetModule("DataTexts")
 local L = LibStub("AceLocale-3.0"):GetLocale("ElvUI_ItemLevelDatatext", false)
 local EP = LibStub("LibElvUIPlugin-1.0")
 local AceTimer = LibStub("AceTimer-3.0")
+
+local unpack = _G["unpack"]
+local GetAverageItemLevel = _G["GetAverageItemLevel"]
+local GetInventoryItemID = _G["GetInventoryItemID"]
+local GetItemInfo = _G["GetItemInfo"]
+local GetInventoryItemLink = _G["GetInventoryItemLink"]
+local GetItemQualityColor = _G["GetItemQualityColor"]
+local GetDetailedItemLevelInfo = _G["GetDetailedItemLevelInfo"]
+local ToggleCharacter = _G["ToggleCharacter"]
 
 local join = string.join
 local floor = math.floor
@@ -40,7 +49,7 @@ end
 
 local function OnEvent(self, event)
 	if event == "PLAYER_ENTERING_WORLD" then
-		LibStub("AceTimer-3.0"):ScheduleTimer(function()
+		AceTimer:ScheduleTimer(function()
 			local total, equipped = GetAverageItemLevel()
 			self.text:SetFormattedText(displayString, L["Item Level"], E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision))
 		end, 5)
@@ -87,28 +96,28 @@ P["ilvldt"] = {
 }
 
 local function InjectOptions()
-	if not E.Options.args.lockslap then
-		E.Options.args.lockslap = {
+	if not E.Options.args.Crackpotx then
+		E.Options.args.Crackpotx = {
 			type = "group",
 			order = -2,
-			name = L["Plugins by |cff9382c9Lockslap|r"],
+			name = L["Plugins by |cff9382c9Crackpotx|r"],
 			args = {
 				thanks = {
 					type = "description",
 					order = 1,
-					name = L["Thanks for using and supporting my work!  -- |cff9382c9Lockslap|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."],
+					name = L["Thanks for using and supporting my work!  -- |cff9382c9Crackpotx|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."],
 				},
 			},
 		}
-	elseif not E.Options.args.lockslap.args.thanks then
-		E.Options.args.lockslap.args.thanks = {
+	elseif not E.Options.args.Crackpotx.args.thanks then
+		E.Options.args.Crackpotx.args.thanks = {
 			type = "description",
 			order = 1,
-			name = L["Thanks for using and supporting my work!  -- |cff9382c9Lockslap|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."],
+			name = L["Thanks for using and supporting my work!  -- |cff9382c9Crackpotx|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."],
 		}
 	end
 	
-	E.Options.args.lockslap.args.ilvldt = {
+	E.Options.args.Crackpotx.args.ilvldt = {
 		type = "group",
 		name = L["Item Level Datatext"],
 		get = function(info) return E.db.ilvldt[info[#info]] end,
