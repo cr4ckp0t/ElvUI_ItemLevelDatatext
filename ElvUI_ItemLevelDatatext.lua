@@ -7,14 +7,15 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ElvUI_ItemLevelDatatext", false)
 local EP = LibStub("LibElvUIPlugin-1.0")
 local AceTimer = LibStub("AceTimer-3.0")
 
-local unpack = _G["unpack"]
+-- local api cache
+local GetDetailedItemLevelInfo = _G["GetDetailedItemLevelInfo"]
 local GetAverageItemLevel = _G["GetAverageItemLevel"]
 local GetInventoryItemID = _G["GetInventoryItemID"]
-local GetItemInfo = _G["GetItemInfo"]
 local GetInventoryItemLink = _G["GetInventoryItemLink"]
+local GetItemInfo = _G["GetItemInfo"]
 local GetItemQualityColor = _G["GetItemQualityColor"]
-local GetDetailedItemLevelInfo = _G["GetDetailedItemLevelInfo"]
 local ToggleCharacter = _G["ToggleCharacter"]
+local unpack = _G["unpack"]
 
 local join = string.join
 local floor = math.floor
@@ -48,15 +49,8 @@ local function DecRound(num, decPlaces)
 end
 
 local function OnEvent(self, event)
-	if event == "PLAYER_ENTERING_WORLD" then
-		AceTimer:ScheduleTimer(function()
-			local total, equipped = GetAverageItemLevel()
-			self.text:SetFormattedText(displayString, L["Item Level"], E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision))
-		end, 5)
-	else
-		local total, equipped = GetAverageItemLevel()
-		self.text:SetFormattedText(displayString, L["Item Level"], E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision))
-	end
+	local total, equipped = GetAverageItemLevel()
+	self.text:SetFormattedText(displayString, L["Item Level"], E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision))
 end
 
 local function OnEnter(self)
@@ -82,6 +76,18 @@ local function OnClick(self, button)
 		OnEvent(self)
 	end
 end
+
+local interval = 10
+local function OnUpdate(self, elapsed)
+	if not self.lastUpdate then self.lastUpdate = 0 end
+	self.lastUpdate = self.lastUpdate + elapsed
+	if self.lastUpdate > interval then
+		self.lastUpdate = 0
+		local total, equipped = GetAverageItemLevel()
+		self.text:SetFormattedText(displayString, L["Item Level"], E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision))
+	end
+end
+
 
 local function ValueColorUpdate(hex, r, g, b)
 	displayString = join("", "|cffffffff%s:|r", " ", hex, "%d|r")
@@ -151,4 +157,4 @@ local function InjectOptions()
 end
 
 EP:RegisterPlugin(..., InjectOptions)
-DT:RegisterDatatext(L["Item Level"], {"PLAYER_ENTERING_WORLD", "PLAYER_EQUIPMENT_CHANGED", "UNIT_INVENTORY_CHANGED"}, OnEvent, nil, OnClick, OnEnter)
+DT:RegisterDatatext(L["Item Level"], {"PLAYER_ENTERING_WORLD"}, OnEvent, OnUpdate, OnClick, OnEnter)
