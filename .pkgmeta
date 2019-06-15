@@ -3,9 +3,13 @@ package-as: ElvUI_ItemLevelDatatext
 enable-nolib-creation: no
 
 externals:
- ElvUI_ItemLevelDatatext\Libraries\LibStub: https://repos.wowace.com/wow/libstub/trunk
- ElvUI_ItemLevelDatatext\Libraries\CallbackHandler-1.0: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
- ElvUI_ItemLevelDatatext\Libraries\AceLocale-3.0: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
+	Libraries\LibStub:
+		url: https://repos.wowace.com/wow/libstub/trunk
+		tag: latest
+	Libraries\CallbackHandler-1.0:
+		url: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
+		tag: latest
+	Libraries\AceLocale-3.0:
+		url: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
 
-ignore:
- README.md
+license-output: LICENSE.TXT

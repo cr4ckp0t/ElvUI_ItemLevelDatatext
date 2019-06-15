@@ -5,8 +5,6 @@
 ## Notes: Simple datatext to show your character's item level.
 ## RequiredDeps: ElvUI
 
-## X-Curse-Project-ID: 50157
-
 Libraries\LibStub\LibStub.lua
 Libraries\CallbackHandler-1.0\CallbackHandler-1.0.xml
 Libraries\AceLocale-3.0\AceLocale-3.0.xml
