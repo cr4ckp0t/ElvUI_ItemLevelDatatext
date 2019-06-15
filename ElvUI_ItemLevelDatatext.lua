@@ -5,7 +5,6 @@ local E, _, V, P, G, _ = unpack(ElvUI)
 local DT = E:GetModule("DataTexts")
 local L = LibStub("AceLocale-3.0"):GetLocale("ElvUI_ItemLevelDatatext", false)
 local EP = LibStub("LibElvUIPlugin-1.0")
-local AceTimer = LibStub("AceTimer-3.0")
 
 -- local api cache
 local GetDetailedItemLevelInfo = _G["GetDetailedItemLevelInfo"]
@@ -90,7 +89,7 @@ end
 
 
 local function ValueColorUpdate(hex, r, g, b)
-	displayString = join("", "|cffffffff%s:|r", " ", hex, "%d|r")
+	displayString = join("", "|cffffffff%s:|r", " ", hex, "%s|r")
 	if lastPanel ~= nil then OnEvent(lastPanel) end
 end
 E["valueColorUpdateFuncs"][ValueColorUpdate] = true

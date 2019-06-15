@@ -1,14 +1,15 @@
 ## Interface: 80100
 ## Author: Crackpotx
 ## Title: |cff1784d1ElvUI|r Item Level Datatext
-## Version: 2.2.1
+## Version: @project-version@
 ## Notes: Simple datatext to show your character's item level.
 ## RequiredDeps: ElvUI
+
+## X-Curse-Project-ID: 50157
 
 Libraries\LibStub\LibStub.lua
 Libraries\CallbackHandler-1.0\CallbackHandler-1.0.xml
 Libraries\AceLocale-3.0\AceLocale-3.0.xml
-Libraries\AceTimer-3.0\AceTimer-3.0.xml
 
 Locales\enUS.lua
 Locales\deDE.lua

@@ -1,0 +1,18 @@
+sudo: false
+language: minimal
+ 
+addons:
+  apt:
+    packages:
+    - luarocks
+
+install: luarocks install --local luacheck
+
+script: /home/travis/.luarocks/bin/luacheck . --nno-color -q
+ 
+after-success:
+  - curl -s https://raw.githubusercontent.com/BigWigsMods/packager/master/release.sh | bash
+ 
+branches:
+  only:
+  - /^\d+\.\d+(\.\d+)?(-\S*)?$/
