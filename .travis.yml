@@ -8,7 +8,7 @@ addons:
 
 install: luarocks install --local luacheck
 
-script: /home/travis/.luarocks/bin/luacheck . --nno-color -q
+script: /home/travis/.luarocks/bin/luacheck . --no-color -q
  
 after-success:
   - curl -s https://raw.githubusercontent.com/BigWigsMods/packager/master/release.sh | bash
