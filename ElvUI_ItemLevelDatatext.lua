@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- ElvUI Item Level Datatext By Crackpotx
 -------------------------------------------------------------------------------
-local E, _, V, P, G, _ = unpack(ElvUI)
+local E, _, _, P, _, _ = unpack(ElvUI)
 local DT = E:GetModule("DataTexts")
 local L = LibStub("AceLocale-3.0"):GetLocale("ElvUI_ItemLevelDatatext", false)
 local EP = LibStub("LibElvUIPlugin-1.0")
