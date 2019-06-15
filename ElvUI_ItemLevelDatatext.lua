@@ -21,7 +21,6 @@ local floor = math.floor
 local format = string.format
 
 local displayString = ""
-local lastPanel
 local slots = {
 	[1] = L["Head"],
 	[2] = L["Neck"],
@@ -90,7 +89,6 @@ end
 
 local function ValueColorUpdate(hex, r, g, b)
 	displayString = join("", "|cffffffff%s:|r", " ", hex, "%s|r")
-	if lastPanel ~= nil then OnEvent(lastPanel) end
 end
 E["valueColorUpdateFuncs"][ValueColorUpdate] = true
 
@@ -121,7 +119,7 @@ local function InjectOptions()
 			name = L["Thanks for using and supporting my work!  -- |cff9382c9Crackpotx|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."],
 		}
 	end
-	
+
 	E.Options.args.Crackpotx.args.ilvldt = {
 		type = "group",
 		name = L["Item Level Datatext"],
