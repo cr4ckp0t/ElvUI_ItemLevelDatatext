@@ -7,8 +7,8 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ElvUI_ItemLevelDatatext", false)
 local EP = LibStub("LibElvUIPlugin-1.0")
 
 -- local api cache
-local GetDetailedItemLevelInfo = _G["GetDetailedItemLevelInfo"]
 local GetAverageItemLevel = _G["GetAverageItemLevel"]
+local GetDetailedItemLevelInfo = _G["GetDetailedItemLevelInfo"]
 local GetInventoryItemID = _G["GetInventoryItemID"]
 local GetInventoryItemLink = _G["GetInventoryItemLink"]
 local GetItemInfo = _G["GetItemInfo"]

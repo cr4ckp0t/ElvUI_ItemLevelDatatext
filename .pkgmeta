@@ -13,3 +13,6 @@ externals:
 		url: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
 
 license-output: LICENSE.TXT
+
+ignore:
+	- README.md
