@@ -7,12 +7,24 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ElvUI_ItemLevelDatatext", false)
 local EP = LibStub("LibElvUIPlugin-1.0")
 
 -- local api cache
+local C_EquipmentSet_GetEquipmentSetInfo = C_EquipmentSet.GetEquipmentSetInfo
+local C_EquipmentSet_ModifyEquipmentSet = C_EquipmentSet.ModifyEquipmentSet
+local C_EquipmentSet_DeleteEquipmentSet = C_EquipmentSet.DeleteEquipmentSet
+local C_EquipmentSet_GetNumEquipmentSets = C_EquipmentSet.GetNumEquipmentSets
+local C_EquipmentSet_GetEquipmentSetID = C_EquipmentSet.GetEquipmentSetID
+local C_EquipmentSet_UseEquipmentSet = C_EquipmentSet.UseEquipmentSet
+local C_EquipmentSet_SaveEquipmentSet = C_EquipmentSet.SaveEquipmentSet
+local EasyMenu = _G["EasyMenu"]
 local GetAverageItemLevel = _G["GetAverageItemLevel"]
 local GetDetailedItemLevelInfo = _G["GetDetailedItemLevelInfo"]
 local GetInventoryItemID = _G["GetInventoryItemID"]
 local GetInventoryItemLink = _G["GetInventoryItemLink"]
 local GetItemInfo = _G["GetItemInfo"]
 local GetItemQualityColor = _G["GetItemQualityColor"]
+local IsShiftKeyDown = _G["IsShiftKeyDown"]
+local IsControlKeyDown = _G["IsControlKeyDown"]
+local IsAltKeyDown = _G["IsAltKeyDown"]
+local StaticPopup_Show = _G["StaticPopup_Show"]
 local ToggleCharacter = _G["ToggleCharacter"]
 local unpack = _G["unpack"]
 
@@ -21,6 +33,7 @@ local floor = math.floor
 local format = string.format
 
 local displayString = ""
+local hexColor = ""
 local slots = {
 	[1] = L["Head"],
 	[2] = L["Neck"],
@@ -41,9 +54,107 @@ local slots = {
 	--[18] = L["Ranged"],
 }
 
+-- for drop down menu
+local menuFrame = CreateFrame("Frame", "ILDTEquipmentSetMenu", E.UIParent, "UIDropDownMenuTemplate")
+
+-- for renaming the equipment set
+StaticPopupDialogs["ILDT_RENAME"] = {
+	text = L["Rename %s to what?"],
+	button1 = ACCEPT,
+	button2 = CANCEL,
+	hasEditBox = true,
+	maxLetters = 16,
+	exclusive = 0,
+	preferredIndex = 3,
+	timeout = 0, 
+	whileDead = true,
+	hideOnEscape = true,
+	OnShow = function(self) _G[self:GetName() .. "EditBox"]:SetFocus(); self.button1:Disable() end,
+	OnHide = function(self)
+		if _G[self:GetName() .. "EditBox"]:IsShown() then
+			_G[self:GetName() .. "EditBox"]:SetFocus()
+		end
+		_G[self:GetName() .. "EditBox"]:SetText("")
+	end,
+	OnAccept = function(self, setId)
+		local newName = _G[self:GetName() .. "EditBox"]:GetText()
+		local oldName = C_EquipmentSet_GetEquipmentSetInfo(setId)
+		if not newName or newName == "" or oldName == newName then return end
+		C_EquipmentSet_ModifyEquipmentSet(setId, newName)
+		DEFAULT_CHAT_FRAME:AddMessage(chatString:format((L["Renamed |cff%s%s|r to |cff%s%s|r!"]):format(hexColor, oldName, hexColor, newName)))
+	end,
+	EditBoxOnEnterPressed = function(self, setId)
+		local newName = self:GetText()
+		local oldName = C_EquipmentSet_GetEquipmentSetInfo(setId)
+		if not newName or newName == "" or oldName == newName then return end
+		C_EquipmentSet_ModifyEquipmentSet(setId, newName)
+		DEFAULT_CHAT_FRAME:AddMessage(chatString:format((L["Renamed |cff%s%s|r to |cff%s%s|r!"]):format(hexColor, oldName, hexColor, newName)))
+		self:GetParent():Hide()
+	end,
+	EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
+	EditBoxOnTextChanged = function(self)
+		local parent = self:GetParent()
+		if _G[parent:GetName() .. "EditBox"]:GetText() == "" then
+			parent.button1:Disable()
+		else
+			parent.button1:Enable();
+		end
+	end
+}
+
+-- staticpoup for deleting
+StaticPopupDialogs["ILDT_DELETE"] = {
+	text = L["Are you sure you want to delete %s?"],
+	button1 = ACCEPT,
+	button2 = CANCEL,
+	timeout = 10,
+	whileDead = true,
+	hideOnEscape = true,
+	OnAccept = function(self, setId)
+		local oldName = C_EquipmentSet_GetEquipmentSetInfo(setId)
+		C_EquipmentSet_DeleteEquipmentSet(setId)
+		DEFAULT_CHAT_FRAME:AddMessage(chatString:format((L["Deleted equipment set |cff%s%s|r!"]):format(hexColor, oldName)))
+	end,
+}
+
 -- rounds a number for printing
 local function DecRound(num, decPlaces)
 	return format("%." .. (decPlaces or 0) .. "f", num)
+end
+
+local function GetEquippedSet()
+	local num = C_EquipmentSet_GetNumEquipmentSets()
+	if num == 0 then return false end
+	for i = 1, num do
+		local name, icon, _, isEquipped = C_EquipmentSet_GetEquipmentSetInfo(i)
+		if isEquipped == true then
+			return name, icon
+		end
+	end
+	return L["None Equipped"]
+end
+
+local function EquipmentSetClick(self, info)
+	local setId = C_EquipmentSet_GetEquipmentSetID(info)
+	if not IsShiftKeyDown() and not IsControlKeyDown() and not IsAltKeyDown() then
+		-- change set
+		C_EquipmentSet_UseEquipmentSet(setId)
+	elseif IsShiftKeyDown() then
+		-- rename set
+		local popup = StaticPopup_Show("ILDT_RENAME", info)
+		if popup then
+			popup.data = setId
+		end
+	elseif IsControlKeyDown() then
+		-- save set
+		C_EquipmentSet_SaveEquipmentSet(setId)
+	elseif IsAltKeyDown() then
+		-- delete set
+		local popup = StaticPopup_Show("ILDT_DELETE", info)
+		if popup then
+			popup.data = setId
+		end
+	end
 end
 
 local function OnEvent(self, event)
@@ -56,6 +167,9 @@ local function OnEnter(self)
 	DT:SetupTooltip(self)
 	DT.tooltip:AddDoubleLine(L["Total"], DecRound(total, E.db.ilvldt.precision), 1, 1, 1, 1, 1, 0)
 	DT.tooltip:AddDoubleLine(L["Equipped"], DecRound(equipped, E.db.ilvldt.precision), 1, 1, 1, 1, 1, 0)
+	if C_EquipmentSet_GetNumEquipmentSets() > 0 then
+		DT.tooltip:AddDoubleLine(L["Equipment Set"], GetEquippedSet(), 1, 1, 1, 1, 1, 0)
+	end
 	DT.tooltip:AddLine(" ")
 	for i = 1, 17 do
 		if slots[i] and GetInventoryItemID("player", i) then
@@ -64,15 +178,47 @@ local function OnEnter(self)
 			DT.tooltip:AddDoubleLine(slots[i], E.db.ilvldt.showItem == true and ("%s (%d)"):format(name, GetDetailedItemLevelInfo(GetInventoryItemLink("player", i))) or GetDetailedItemLevelInfo(GetInventoryItemLink("player", i)), 1, 1, 1, red, green, blue)
 		end
 	end
+	DT.tooltip:AddLine(" ")
+	DT.tooltip:AddDoubleLine(L["Left Click"], L["Open Character Pane"], 1, 1, 1, 1, 1, 0)
+	DT.tooltip:AddDoubleLine(L["Right Click"], L["Change Equipment Set"], 1, 1, 1, 1, 1, 0)
 	DT.tooltip:Show()
 end
 
 local function OnClick(self, button)
 	if button == "LeftButton" then
 		ToggleCharacter("PaperDollFrame")
-	else
-		OnEvent(self)
+	elseif button == "RightButton" then
+		DT.tooltip:Hide()
+		
+		local menuList = {{text = L["Choose Equipment Set"], isTitle = true, notCheckable = true,},}
+		local numSets, curNumSets = C_EquipmentSet_GetNumEquipmentSets(), 2
+		local color = "ffffff"
+		
+		if numSets == 0 then
+			menuList[curNumSets] = {text = ("|cffff0000%s|r"):format(L["No Equipment Sets"]), notCheckable = true,}
+		else
+			
+			for i = 1, numSets do
+				local name, _, _, isEquipped, _, _, _, missing, _ = C_EquipmentSet_GetEquipmentSetInfo(i)
+				if missing > 0 then
+					color = "ff0000"
+				else
+					color = isEquipped == true and hexColor or "ffffff"
+				end
+				
+				menuList[curNumSets] = {text = ("|cff%s%s|r"):format(color, name), func = EquipmentSetClick, arg1 = name, checked = isEquipped == true and true or false,}
+				curNumSets = curNumSets + 1
+			end
+			
+			-- add a hint
+			menuList[curNumSets] = {text = L["Shift + Click to Rename"], isTitle = true, notCheckable = true, notClickable = true}
+			menuList[curNumSets + 1] = {text = L["Ctrl + Click to Save"], isTitle = true, notCheckable = true, notClickable = true}
+			menuList[curNumSets + 2] = {text = L["Alt + Click to Delete"], isTitle = true, notCheckable = true, notClickable = true}
+		end
+		EasyMenu(menuList, menuFrame, "cursor", 0, 0, "MENU", 2)
 	end
+	
+	OnEvent(self)
 end
 
 local interval = 10
@@ -89,6 +235,7 @@ end
 
 local function ValueColorUpdate(hex, r, g, b)
 	displayString = join("", "|cffffffff%s:|r", " ", hex, "%s|r")
+	hexColor = ("%02x%02x%02x"):format(r * 255, g * 255, b * 255) or "ffffff"
 end
 E["valueColorUpdateFuncs"][ValueColorUpdate] = true
 
