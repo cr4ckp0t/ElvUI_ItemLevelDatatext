@@ -194,11 +194,11 @@ local function OnClick(self, button)
 		local numSets, curNumSets = C_EquipmentSet_GetNumEquipmentSets(), 2
 		local color = "ffffff"
 		
-		if numSets == 0 then
+		if not numSets or numSets == 0 then
 			menuList[curNumSets] = {text = ("|cffff0000%s|r"):format(L["No Equipment Sets"]), notCheckable = true,}
 		else
 			
-			for i = 1, numSets do
+			for i = 0, numSets - 1 do
 				local name, _, _, isEquipped, _, _, _, missing, _ = C_EquipmentSet_GetEquipmentSetInfo(i)
 				if missing > 0 then
 					color = "ff0000"
@@ -250,12 +250,12 @@ local function InjectOptions()
 		E.Options.args.Crackpotx = {
 			type = "group",
 			order = -2,
-			name = L["Plugins by |cff9382c9Crackpotx|r"],
+			name = L["Plugins by |cff0070deCrackpotx|r"],
 			args = {
 				thanks = {
 					type = "description",
 					order = 1,
-					name = L["Thanks for using and supporting my work!  -- |cff9382c9Crackpotx|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."],
+					name = L["Thanks for using and supporting my work!  -- |cff0070deCrackpotx|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."],
 				},
 			},
 		}
@@ -263,7 +263,7 @@ local function InjectOptions()
 		E.Options.args.Crackpotx.args.thanks = {
 			type = "description",
 			order = 1,
-			name = L["Thanks for using and supporting my work!  -- |cff9382c9Crackpotx|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."],
+			name = L["Thanks for using and supporting my work!  -- |cff0070deCrackpotx|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."],
 		}
 	end
 
