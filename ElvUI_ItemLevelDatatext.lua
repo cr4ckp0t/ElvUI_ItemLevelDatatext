@@ -197,10 +197,14 @@ local function OnClick(self, button)
 		if not numSets or numSets == 0 then
 			menuList[curNumSets] = {text = ("|cffff0000%s|r"):format(L["No Equipment Sets"]), notCheckable = true,}
 		else
-			
-			for i = 0, numSets - 1 do
+
+			-- blizzard api is bass ackwards
+			local minimum = numSets <= 2 and 1 or 0
+			local maximum = numSets <= 2 and numSets or numSets - 1
+
+			for i = minimum, maximum do
 				local name, _, _, isEquipped, _, _, _, missing, _ = C_EquipmentSet_GetEquipmentSetInfo(i)
-				if missing > 0 then
+				if name and missing > 0 then
 					color = "ff0000"
 				else
 					color = isEquipped == true and hexColor or "ffffff"
