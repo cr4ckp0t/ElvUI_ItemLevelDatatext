@@ -56,6 +56,7 @@ local slots = {
 
 -- for drop down menu
 local menuFrame = CreateFrame("Frame", "ILDTEquipmentSetMenu", E.UIParent, "UIDropDownMenuTemplate")
+local lastPanel
 
 -- for renaming the equipment set
 StaticPopupDialogs["ILDT_RENAME"] = {
@@ -158,6 +159,7 @@ local function EquipmentSetClick(self, info)
 end
 
 local function OnEvent(self, event)
+	lastPanel = self
 	local total, equipped = GetAverageItemLevel()
 	self.text:SetFormattedText(displayString, L["Item Level"], E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision))
 end
@@ -240,6 +242,10 @@ end
 local function ValueColorUpdate(hex, r, g, b)
 	displayString = join("", "|cffffffff%s:|r", " ", hex, "%s|r")
 	hexColor = ("%02x%02x%02x"):format(r * 255, g * 255, b * 255) or "ffffff"
+
+	if lastPanel ~= nil then
+		OnEvent(lastPanel, "ELVUI_COLOR_UPDATE")
+	end
 end
 E["valueColorUpdateFuncs"][ValueColorUpdate] = true
 
