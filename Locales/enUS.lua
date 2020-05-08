@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- ElvUI ItemLevelDatatext By Crackpotx (US, Lightbringer)
+-- ElvUI ItemLevelDatatext By Crackpot (US, Thrall)
 -------------------------------------------------------------------------------
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ElvUI_ItemLevelDatatext", "enUS", true, true)

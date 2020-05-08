@@ -34,6 +34,7 @@ local format = string.format
 
 local displayString = ""
 local hexColor = ""
+local rgbColor
 local slots = {
 	[1] = L["Head"],
 	[2] = L["Neck"],
@@ -167,10 +168,10 @@ end
 local function OnEnter(self)
 	local total, equipped = GetAverageItemLevel()
 	DT:SetupTooltip(self)
-	DT.tooltip:AddDoubleLine(L["Total"], DecRound(total, E.db.ilvldt.precision), 1, 1, 1, 1, 1, 0)
-	DT.tooltip:AddDoubleLine(L["Equipped"], DecRound(equipped, E.db.ilvldt.precision), 1, 1, 1, 1, 1, 0)
+	DT.tooltip:AddDoubleLine(L["Total"], DecRound(total, E.db.ilvldt.precision), 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
+	DT.tooltip:AddDoubleLine(L["Equipped"], DecRound(equipped, E.db.ilvldt.precision), 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
 	if C_EquipmentSet_GetNumEquipmentSets() > 0 then
-		DT.tooltip:AddDoubleLine(L["Equipment Set"], GetEquippedSet(), 1, 1, 1, 1, 1, 0)
+		DT.tooltip:AddDoubleLine(L["Equipment Set"], GetEquippedSet(), 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
 	end
 	DT.tooltip:AddLine(" ")
 	for i = 1, 17 do
@@ -181,8 +182,8 @@ local function OnEnter(self)
 		end
 	end
 	DT.tooltip:AddLine(" ")
-	DT.tooltip:AddDoubleLine(L["Left Click"], L["Open Character Pane"], 1, 1, 1, 1, 1, 0)
-	DT.tooltip:AddDoubleLine(L["Right Click"], L["Change Equipment Set"], 1, 1, 1, 1, 1, 0)
+	DT.tooltip:AddDoubleLine(L["Left Click"], L["Open Character Pane"], 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
+	DT.tooltip:AddDoubleLine(L["Right Click"], L["Change Equipment Set"], 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
 	DT.tooltip:Show()
 end
 
@@ -193,33 +194,30 @@ local function OnClick(self, button)
 		DT.tooltip:Hide()
 		
 		local menuList = {{text = L["Choose Equipment Set"], isTitle = true, notCheckable = true,},}
-		local numSets, curNumSets = C_EquipmentSet_GetNumEquipmentSets(), 2
+		local numSets = C_EquipmentSet_GetNumEquipmentSets()
 		local color = "ffffff"
 		
-		if not numSets or numSets == 0 then
-			menuList[curNumSets] = {text = ("|cffff0000%s|r"):format(L["No Equipment Sets"]), notCheckable = true,}
+		if not numSets or tonumber(numSets) == 0 then
+			menuList[#menuList + 1] = {text = ("|cffff0000%s|r"):format(L["No Equipment Sets"]), notCheckable = true,}
 		else
-
-			-- blizzard api is bass ackwards
-			local minimum = numSets <= 2 and 1 or 0
-			local maximum = numSets <= 2 and numSets or numSets - 1
-
-			for i = minimum, maximum do
+			for i = 0, numSets - 1 do
 				local name, _, _, isEquipped, _, _, _, missing, _ = C_EquipmentSet_GetEquipmentSetInfo(i)
+				print(i, name)
 				if name and missing > 0 then
 					color = "ff0000"
 				else
 					color = isEquipped == true and hexColor or "ffffff"
 				end
 				
-				menuList[curNumSets] = {text = ("|cff%s%s|r"):format(color, name), func = EquipmentSetClick, arg1 = name, checked = isEquipped == true and true or false,}
-				curNumSets = curNumSets + 1
+				if name then
+					menuList[#menuList + 1] = {text = ("|cff%s%s|r"):format(color, name), func = EquipmentSetClick, arg1 = name, checked = isEquipped == true and true or false,}
+				end
 			end
 			
 			-- add a hint
-			menuList[curNumSets] = {text = L["Shift + Click to Rename"], isTitle = true, notCheckable = true, notClickable = true}
-			menuList[curNumSets + 1] = {text = L["Ctrl + Click to Save"], isTitle = true, notCheckable = true, notClickable = true}
-			menuList[curNumSets + 2] = {text = L["Alt + Click to Delete"], isTitle = true, notCheckable = true, notClickable = true}
+			menuList[#menuList + 1] = {text = L["Shift + Click to Rename"], isTitle = true, notCheckable = true, notClickable = true}
+			menuList[#menuList + 1] = {text = L["Ctrl + Click to Save"], isTitle = true, notCheckable = true, notClickable = true}
+			menuList[#menuList + 1] = {text = L["Alt + Click to Delete"], isTitle = true, notCheckable = true, notClickable = true}
 		end
 		EasyMenu(menuList, menuFrame, "cursor", 0, 0, "MENU", 2)
 	end
@@ -242,7 +240,11 @@ end
 local function ValueColorUpdate(hex, r, g, b)
 	displayString = join("", "|cffffffff%s:|r", " ", hex, "%s|r")
 	hexColor = ("%02x%02x%02x"):format(r * 255, g * 255, b * 255) or "ffffff"
-
+	rgbColor = {
+		r = r,
+		g = g,
+		b = b,
+	}
 	if lastPanel ~= nil then
 		OnEvent(lastPanel, "ELVUI_COLOR_UPDATE")
 	end
