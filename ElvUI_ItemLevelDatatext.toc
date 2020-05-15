@@ -1,7 +1,7 @@
 ## Interface: 80300
 ## Author: Crackpotx
 ## Title: |cff1784d1ElvUI|r Item Level Datatext
-## Version: 2.3.8
+## Version: 2.3.9
 ## Notes: Simple datatext to show your character's item level.
 ## RequiredDeps: ElvUI
 

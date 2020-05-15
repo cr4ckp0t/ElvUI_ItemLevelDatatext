@@ -202,7 +202,6 @@ local function OnClick(self, button)
 		else
 			for i = 0, numSets - 1 do
 				local name, _, _, isEquipped, _, _, _, missing, _ = C_EquipmentSet_GetEquipmentSetInfo(i)
-				print(i, name)
 				if name and missing > 0 then
 					color = "ff0000"
 				else
