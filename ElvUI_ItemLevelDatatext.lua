@@ -200,15 +200,15 @@ local function OnClick(self, button)
 		if not numSets or tonumber(numSets) == 0 then
 			menuList[#menuList + 1] = {text = ("|cffff0000%s|r"):format(L["No Equipment Sets"]), notCheckable = true,}
 		else
-			for i = 0, numSets - 1 do
+			for i = 0, numSets do
 				local name, _, _, isEquipped, _, _, _, missing, _ = C_EquipmentSet_GetEquipmentSetInfo(i)
-				if name and missing > 0 then
-					color = "ff0000"
-				else
-					color = isEquipped == true and hexColor or "ffffff"
-				end
-				
 				if name then
+					if missing > 0 then
+						color = "ff0000"
+					else
+						color = isEquipped == true and hexColor or "ffffff"
+					end
+
 					menuList[#menuList + 1] = {text = ("|cff%s%s|r"):format(color, name), func = EquipmentSetClick, arg1 = name, checked = isEquipped == true and true or false,}
 				end
 			end
