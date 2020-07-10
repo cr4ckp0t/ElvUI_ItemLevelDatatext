@@ -313,3 +313,4 @@ end
 
 EP:RegisterPlugin(..., InjectOptions)
 DT:RegisterDatatext(L["Item Level (Improved)"], nil, {"PLAYER_ENTERING_WORLD"}, OnEvent, OnUpdate, OnClick, OnEnter, nil, L["Item Level (Improved)"])
+--DT:RegisterDatatext(L["Item Level (Improved)"], {"PLAYER_ENTERING_WORLD"}, OnEvent, OnUpdate, OnClick, OnEnter)
