@@ -32,6 +32,7 @@ local join = string.join
 local floor = math.floor
 local format = string.format
 
+local maxEquipmentSets = 10
 local displayString = ""
 local hexColor = ""
 local rgbColor
@@ -142,9 +143,9 @@ local function GetEquippedSet()
 	if num == 0 then
 		return false
 	end
-	for i = 1, num do
+	for i = 0, maxEquipmentSets do
 		local name, icon, _, isEquipped = C_EquipmentSet_GetEquipmentSetInfo(i)
-		if isEquipped == true then
+		if name and isEquipped == true then
 			return name, icon
 		end
 	end
@@ -248,7 +249,7 @@ local function OnClick(self, button)
 		if not numSets or tonumber(numSets) == 0 then
 			menuList[#menuList + 1] = {text = ("|cffff0000%s|r"):format(L["No Equipment Sets"]), notCheckable = true}
 		else
-			for i = 0, numSets do
+			for i = 0, maxEquipmentSets do
 				local name, _, _, isEquipped, _, _, _, missing, _ = C_EquipmentSet_GetEquipmentSetInfo(i)
 				if name then
 					if missing > 0 then
