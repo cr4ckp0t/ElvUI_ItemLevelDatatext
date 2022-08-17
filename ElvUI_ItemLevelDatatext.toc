@@ -1,7 +1,7 @@
-## Interface: 90205
+## Interface: 90207
 ## Author: Crackpot
 ## Title: |cff1784d1ElvUI|r Item Level Datatext
-## Version: 3.0.8
+## Version: 3.0.9
 ## Notes: Simple datatext to show your character's item level.
 ## RequiredDeps: ElvUI
 
