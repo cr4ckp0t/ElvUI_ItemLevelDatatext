@@ -19,6 +19,7 @@ local GetAverageItemLevel = _G["GetAverageItemLevel"]
 local GetDetailedItemLevelInfo = _G["GetDetailedItemLevelInfo"]
 local GetInventoryItemID = _G["GetInventoryItemID"]
 local GetInventoryItemLink = _G["GetInventoryItemLink"]
+local GetInventoryItemTexture = _G["GetInventoryItemTexture"]
 local GetItemInfo = _G["GetItemInfo"]
 local GetItemQualityColor = _G["GetItemQualityColor"]
 local IsShiftKeyDown = _G["IsShiftKeyDown"]
@@ -186,26 +187,8 @@ end
 local function OnEnter(self)
 	local total, equipped = GetAverageItemLevel()
 	DT:SetupTooltip(self)
-	DT.tooltip:AddDoubleLine(
-		L["Total"],
-		DecRound(total, E.db.ilvldt.precision),
-		1,
-		1,
-		1,
-		rgbColor.r,
-		rgbColor.g,
-		rgbColor.b
-	)
-	DT.tooltip:AddDoubleLine(
-		L["Equipped"],
-		DecRound(equipped, E.db.ilvldt.precision),
-		1,
-		1,
-		1,
-		rgbColor.r,
-		rgbColor.g,
-		rgbColor.b
-	)
+	DT.tooltip:AddDoubleLine(L["Total"], DecRound(total, E.db.ilvldt.precision), 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
+	DT.tooltip:AddDoubleLine(L["Equipped"], DecRound(equipped, E.db.ilvldt.precision), 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
 	if C_EquipmentSet_GetNumEquipmentSets() > 0 then
 		DT.tooltip:AddDoubleLine(L["Equipment Set"], GetEquippedSet(), 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
 	end
@@ -214,18 +197,8 @@ local function OnEnter(self)
 		if slots[i] and GetInventoryItemID("player", i) then
 			local name, _, quality, _, _, _, _, _, _, _, _ = GetItemInfo(GetInventoryItemLink("player", i))
 			local red, green, blue, _ = GetItemQualityColor(quality)
-			DT.tooltip:AddDoubleLine(
-				slots[i],
-				E.db.ilvldt.showItem == true and
-					("%s (%d)"):format(name, GetDetailedItemLevelInfo(GetInventoryItemLink("player", i))) or
-					GetDetailedItemLevelInfo(GetInventoryItemLink("player", i)),
-				1,
-				1,
-				1,
-				red,
-				green,
-				blue
-			)
+			--DT.tooltip:AddDoubleLine(slots[i], E.db.ilvldt.showItem == true and ("%s (%d)"):format(name, GetDetailedItemLevelInfo(GetInventoryItemLink("player", i))) or GetDetailedItemLevelInfo(GetInventoryItemLink("player", i)), 1, 1, 1, red, green, blue)
+			DT.tooltip:AddDoubleLine(slots[i], E.db.ilvldt.showItem == true and ("|T%s:14:14:0:0:64:64:4:60:4:60|t %s (%d)"):format(GetInventoryItemTexture("player", i), GetInventoryItemLink("player", i), GetDetailedItemLevelInfo(GetInventoryItemLink("player", i))) or GetDetailedItemLevelInfo(GetInventoryItemLink("player", i)), 1, 1, 1, red, green, blue)
 		end
 	end
 	DT.tooltip:AddLine(" ")
