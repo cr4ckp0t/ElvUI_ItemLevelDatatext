@@ -58,7 +58,6 @@ local slots = {
 
 -- for drop down menu
 local menuFrame = CreateFrame("Frame", "ILDTEquipmentSetMenu", E.UIParent, "UIDropDownMenuTemplate")
-local lastPanel
 
 -- for renaming the equipment set
 StaticPopupDialogs["ILDT_RENAME"] = {
@@ -176,7 +175,6 @@ local function EquipmentSetClick(self, info)
 end
 
 local function OnEvent(self, event)
-	lastPanel = self
 	local total, equipped = GetAverageItemLevel()
 	self.text:SetFormattedText(
 		displayString,
@@ -310,19 +308,16 @@ local function OnUpdate(self, elapsed)
 	end
 end
 
-local function ValueColorUpdate(hex, r, g, b)
+local function ValueColorUpdate(self, hex, r, g, b)
 	displayString = join("", "|cffffffff%s:|r", " ", hex, "%s|r")
-	hexColor = ("%02x%02x%02x"):format(r * 255, g * 255, b * 255) or "ffffff"
+	hexColor = hex or "ffffff"
 	rgbColor = {
 		r = r,
 		g = g,
 		b = b
 	}
-	if lastPanel ~= nil then
-		OnEvent(lastPanel, "ELVUI_COLOR_UPDATE")
-	end
+	OnEvent(self)
 end
-E["valueColorUpdateFuncs"][ValueColorUpdate] = true
 
 P["ilvldt"] = {
 	["ilvl"] = "equip",
@@ -397,15 +392,4 @@ local function InjectOptions()
 end
 
 EP:RegisterPlugin(..., InjectOptions)
-DT:RegisterDatatext(
-	L["Item Level (Improved)"],
-	nil,
-	{"PLAYER_ENTERING_WORLD"},
-	OnEvent,
-	OnUpdate,
-	OnClick,
-	OnEnter,
-	nil,
-	L["Item Level (Improved)"]
-)
---DT:RegisterDatatext(L["Item Level (Improved)"], {"PLAYER_ENTERING_WORLD"}, OnEvent, OnUpdate, OnClick, OnEnter)
+DT:RegisterDatatext(L["Item Level (Improved)"], nil, {"PLAYER_ENTERING_WORLD"}, OnEvent, OnUpdate, OnClick, OnEnter, nil, L["Item Level (Improved)"], nil, ValueColorUpdate)
