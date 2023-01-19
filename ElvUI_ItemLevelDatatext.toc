@@ -3,6 +3,7 @@
 ## Title: |cff1784d1ElvUI|r Item Level Datatext
 ## Version: 3.1.0
 ## Notes: Simple datatext to show your character's item level.
+## Notes-ruRU: Простой текст данных, показывающий уровень предметов Вашего персонажа.
 ## RequiredDeps: ElvUI
 
 Libraries\LibStub\LibStub.lua
