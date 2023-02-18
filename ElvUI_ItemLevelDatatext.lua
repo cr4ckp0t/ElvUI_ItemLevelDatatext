@@ -3,8 +3,8 @@
 -------------------------------------------------------------------------------
 local E, _, _, P, _, _ = unpack(ElvUI)
 local DT = E:GetModule("DataTexts")
-local L = LibStub("AceLocale-3.0"):GetLocale("ElvUI_ItemLevelDatatext", false)
-local EP = LibStub("LibElvUIPlugin-1.0")
+local L = E.Libs.ACL:GetLocale("ElvUI_ItemLevelDatatext", false)
+local EP = E.Libs.EP
 
 -- local api cache
 local C_EquipmentSet_GetEquipmentSetInfo = C_EquipmentSet.GetEquipmentSetInfo

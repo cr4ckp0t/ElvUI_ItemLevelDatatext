@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
--- ElvUI Item Level Datatext By Crackpot (US, Thrall)
+-- ElvUI_ItemLevelDatatext By Crackpot (US, Illidan)
 -------------------------------------------------------------------------------
-local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
-local L = AceLocale:NewLocale("ElvUI_ItemLevelDatatext", "zhTW", false)
+local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI_ItemLevelDatatext", "zhTW", false)
 if not L then return end
 
 --@localization(locale="zhTW", format="lua_additive_table", same-key-is-true=true, escape-non-ascii=true, handle-unlocalized="english")@
+
