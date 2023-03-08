@@ -5,6 +5,7 @@ local E, _, _, P, _, _ = unpack(ElvUI)
 local DT = E:GetModule("DataTexts")
 local L = E.Libs.ACL:GetLocale("ElvUI_ItemLevelDatatext", false)
 local EP = E.Libs.EP
+local ACH = E.Libs.ACH
 
 -- local api cache
 local C_EquipmentSet_GetEquipmentSetInfo = C_EquipmentSet.GetEquipmentSetInfo
@@ -36,7 +37,6 @@ local format = string.format
 local maxEquipmentSets = 10
 local displayString = ""
 local hexColor = ""
-local rgbColor
 local slots = {
 	[1] = L["Head"],
 	[2] = L["Neck"],
@@ -179,12 +179,6 @@ end
 local function OnEnter(self)
 	local total, equipped = GetAverageItemLevel()
 	DT:SetupTooltip(self)
-	DT.tooltip:AddDoubleLine(L["Total"], DecRound(total, E.db.ilvldt.precision), 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
-	DT.tooltip:AddDoubleLine(L["Equipped"], DecRound(equipped, E.db.ilvldt.precision), 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
-	if C_EquipmentSet_GetNumEquipmentSets() > 0 then
-		DT.tooltip:AddDoubleLine(L["Equipment Set"], GetEquippedSet(), 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
-	end
-	DT.tooltip:AddLine(" ")
 	for i = 1, 17 do
 		if slots[i] and GetInventoryItemID("player", i) then
 			local name, _, quality, _, _, _, _, _, _, _, _ = GetItemInfo(GetInventoryItemLink("player", i))
@@ -194,8 +188,14 @@ local function OnEnter(self)
 		end
 	end
 	DT.tooltip:AddLine(" ")
-	DT.tooltip:AddDoubleLine(L["Left Click"], L["Open Character Pane"], 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
-	DT.tooltip:AddDoubleLine(L["Right Click"], L["Change Equipment Set"], 1, 1, 1, rgbColor.r, rgbColor.g, rgbColor.b)
+	DT.tooltip:AddDoubleLine(L["Total"], DecRound(total, E.db.ilvldt.precision), 1, 1, 1, nil, nil, nil)
+	DT.tooltip:AddDoubleLine(L["Equipped"], DecRound(equipped, E.db.ilvldt.precision), 1, 1, 1, nil, nil, nil)
+	if C_EquipmentSet_GetNumEquipmentSets() > 0 then
+		DT.tooltip:AddDoubleLine(L["Equipment Set"], GetEquippedSet(), 1, 1, 1, nil, nil, nil)
+	end
+	DT.tooltip:AddLine(" ")
+	DT.tooltip:AddDoubleLine(L["Left Click"], L["Open Character Pane"], 1, 1, 1, nil, nil, nil)
+	DT.tooltip:AddDoubleLine(L["Right Click"], L["Change Equipment Set"], 1, 1, 1, nil, nil, nil)
 	DT.tooltip:Show()
 end
 
@@ -272,11 +272,6 @@ end
 local function ValueColorUpdate(self, hex, r, g, b)
 	displayString = join("", "|cffffffff%s:|r", " ", hex, "%s|r")
 	hexColor = hex or "ffffff"
-	rgbColor = {
-		r = r,
-		g = g,
-		b = b
-	}
 	OnEvent(self)
 end
 
@@ -288,68 +283,16 @@ P["ilvldt"] = {
 
 local function InjectOptions()
 	if not E.Options.args.Crackpotx then
-		E.Options.args.Crackpotx = {
-			type = "group",
-			order = -2,
-			name = L["Plugins by |cff0070deCrackpotx|r"],
-			args = {
-				thanks = {
-					type = "description",
-					order = 1,
-					name = L[
-						"Thanks for using and supporting my work!  -- |cff0070deCrackpotx|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."
-					]
-				}
-			}
-		}
-	elseif not E.Options.args.Crackpotx.args.thanks then
-		E.Options.args.Crackpotx.args.thanks = {
-			type = "description",
-			order = 1,
-			name = L[
-				"Thanks for using and supporting my work!  -- |cff0070deCrackpotx|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."
-			]
-		}
+		E.Options.args.Crackpotx = ACH:Group(L["Plugins by |cff0070deCrackpotx|r"])
+	end
+	if not E.Options.args.Crackpotx.args.thanks then
+		E.Options.args.Crackpotx.args.thanks = ACH:Description(L["Thanks for using and supporting my work!  -- |cff0070deCrackpotx|r\n\n|cffff0000If you find any bugs, or have any suggestions for any of my addons, please open a ticket at that particular addon's page on CurseForge."], 1)
 	end
 
-	E.Options.args.Crackpotx.args.ilvldt = {
-		type = "group",
-		name = L["Item Level Datatext"],
-		get = function(info)
-			return E.db.ilvldt[info[#info]]
-		end,
-		set = function(info, value)
-			E.db.ilvldt[info[#info]] = value
-			DT:LoadDataTexts()
-		end,
-		args = {
-			ilvl = {
-				type = "select",
-				order = 4,
-				name = L["iLvl Display"],
-				desc = L["Select which item level you want to display in the datatext, total or equipped."],
-				values = {
-					["equip"] = L["Equipped"],
-					["total"] = L["Total"]
-				}
-			},
-			precision = {
-				type = "range",
-				order = 5,
-				name = L["Precision"],
-				desc = L["Number of decimal places to round to for the average item level."],
-				min = 0,
-				max = 5,
-				step = 1
-			},
-			showItem = {
-				type = "toggle",
-				order = 6,
-				name = L["Show Item Name"],
-				desc = L["Show item name in the tooltip."]
-			}
-		}
-	}
+	E.Options.args.Crackpotx.args.ilvldt = ACH:Group(L["Item Level Datatext"], nil, nil, nil, function(info) return E.db.ilvldt[info[#info]] end, function(info, value) E.db.ilvldt[info[#info]] = value; DT:ForceUpdate_DataText(L["Item Level (Improved)"]) end)
+	E.Options.args.Crackpotx.args.ilvldt.args.ilvl = ACH:Select(L["iLvl Display"], L["Select which item level you want to display in the datatext, total or equipped."], 1, { ["equip"] = L["Equipped"], ["total"] = L["Total"] })
+	E.Options.args.Crackpotx.args.ilvldt.args.precision = ACH:Range(L["Precision"], L["Number of decimal places to round to for the average item level."], 2, { min = 0, max = 5, step = 1 })
+	E.Options.args.Crackpotx.args.ilvldt.args.showItem = ACH:Toggle(L["Show Item Name"], L["Show item name in the tooltip."], 3)
 end
 
 EP:RegisterPlugin(..., InjectOptions)
