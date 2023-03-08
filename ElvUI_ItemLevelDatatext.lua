@@ -89,9 +89,7 @@ StaticPopupDialogs["ILDT_RENAME"] = {
 			return
 		end
 		C_EquipmentSet_ModifyEquipmentSet(setId, newName)
-		DEFAULT_CHAT_FRAME:AddMessage(
-			chatString:format((L["Renamed |cff%s%s|r to |cff%s%s|r!"]):format(hexColor, oldName, hexColor, newName))
-		)
+		DEFAULT_CHAT_FRAME:AddMessage(chatString:format((L["Renamed |cff%s%s|r to |cff%s%s|r!"]):format(hexColor, oldName, hexColor, newName)))
 	end,
 	EditBoxOnEnterPressed = function(self, setId)
 		local newName = self:GetText()
@@ -100,9 +98,7 @@ StaticPopupDialogs["ILDT_RENAME"] = {
 			return
 		end
 		C_EquipmentSet_ModifyEquipmentSet(setId, newName)
-		DEFAULT_CHAT_FRAME:AddMessage(
-			chatString:format((L["Renamed |cff%s%s|r to |cff%s%s|r!"]):format(hexColor, oldName, hexColor, newName))
-		)
+		DEFAULT_CHAT_FRAME:AddMessage(chatString:format((L["Renamed |cff%s%s|r to |cff%s%s|r!"]):format(hexColor, oldName, hexColor, newName)))
 		self:GetParent():Hide()
 	end,
 	EditBoxOnEscapePressed = function(self)
@@ -177,11 +173,7 @@ end
 
 local function OnEvent(self, event)
 	local total, equipped = GetAverageItemLevel()
-	self.text:SetFormattedText(
-		displayString,
-		L["Item Level"],
-		E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision)
-	)
+	self.text:SetFormattedText(displayString, L["Item Level"], E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision))
 end
 
 local function OnEnter(self)
@@ -226,11 +218,11 @@ local function OnClick(self, button)
 					if missing > 0 then
 						color = "ff0000"
 					else
-						color = isEquipped == true and hexColor or "ffffff"
+						color = isEquipped == true and hexColor or ""
 					end
 
 					menuList[#menuList + 1] = {
-						text = ("|cff%s%s|r"):format(color, name),
+						text = ("%s%s|r"):format(color, name),
 						func = EquipmentSetClick,
 						arg1 = name,
 						checked = isEquipped == true and true or false
@@ -273,11 +265,7 @@ local function OnUpdate(self, elapsed)
 	if self.lastUpdate > interval then
 		self.lastUpdate = 0
 		local total, equipped = GetAverageItemLevel()
-		self.text:SetFormattedText(
-			displayString,
-			L["Item Level"],
-			E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision)
-		)
+		self.text:SetFormattedText(displayString, L["Item Level"], E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision))
 	end
 end
 
