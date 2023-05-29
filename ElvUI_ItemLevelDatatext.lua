@@ -23,6 +23,7 @@ local GetInventoryItemLink = _G["GetInventoryItemLink"]
 local GetInventoryItemTexture = _G["GetInventoryItemTexture"]
 local GetItemInfo = _G["GetItemInfo"]
 local GetItemQualityColor = _G["GetItemQualityColor"]
+local gsub = string.gsub
 local IsShiftKeyDown = _G["IsShiftKeyDown"]
 local IsControlKeyDown = _G["IsControlKeyDown"]
 local IsAltKeyDown = _G["IsAltKeyDown"]
@@ -216,9 +217,9 @@ local function OnClick(self, button)
 				local name, _, _, isEquipped, _, _, _, missing, _ = C_EquipmentSet_GetEquipmentSetInfo(i)
 				if name then
 					if missing > 0 then
-						color = "ff0000"
+						color = "|cffff0000"
 					else
-						color = isEquipped == true and hexColor or ""
+						color = isEquipped == true and hexColor or "|cffffffff"
 					end
 
 					menuList[#menuList + 1] = {
