@@ -1,7 +1,8 @@
 ## Interface: 100107
 ## Author: Crackpot
-## Title: |cff1784d1ElvUI|r Item Level Datatext
-## Version: 3.2.8
+## Title: ElvUI Item Level Datatext
+## IconTexture: Interface\AddOns\ElvUI_ItemLevelDatatext\Media\crackpot
+## Version: 3.2.9
 ## Notes: Simple datatext to show your character's item level.
 ## RequiredDeps: ElvUI
 
@@ -18,11 +19,4 @@ Locales\zhCN.lua
 Locales\zhTW.lua
 
 ElvUI_ItemLevelDatatext.lua
-
-
-
-
-
-
-
 
