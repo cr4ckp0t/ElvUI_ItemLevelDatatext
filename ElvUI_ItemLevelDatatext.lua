@@ -6,6 +6,7 @@ local DT = E:GetModule("DataTexts")
 local L = E.Libs.ACL:GetLocale("ElvUI_ItemLevelDatatext", false)
 local EP = E.Libs.EP
 local ACH = E.Libs.ACH
+local EasyMenu = LibStub("LibEasyMenu-1.0")
 
 -- local api cache
 local C_EquipmentSet_GetEquipmentSetInfo = C_EquipmentSet.GetEquipmentSetInfo
@@ -15,7 +16,7 @@ local C_EquipmentSet_GetNumEquipmentSets = C_EquipmentSet.GetNumEquipmentSets
 local C_EquipmentSet_GetEquipmentSetID = C_EquipmentSet.GetEquipmentSetID
 local C_EquipmentSet_UseEquipmentSet = C_EquipmentSet.UseEquipmentSet
 local C_EquipmentSet_SaveEquipmentSet = C_EquipmentSet.SaveEquipmentSet
-local EasyMenu = _G["EasyMenu"]
+--local EasyMenu = _G["EasyMenu"]
 local GetAverageItemLevel = _G["GetAverageItemLevel"]
 local GetDetailedItemLevelInfo = _G["GetDetailedItemLevelInfo"]
 local GetInventoryItemID = _G["GetInventoryItemID"]
@@ -251,7 +252,7 @@ local function OnClick(self, button)
 				notClickable = true
 			}
 		end
-		EasyMenu(menuList, menuFrame, "cursor", 0, 0, "MENU", 2)
+		EasyMenu.Create(menuList, menuFrame, "cursor", 0, 0, "MENU", 2)
 	end
 
 	OnEvent(self)

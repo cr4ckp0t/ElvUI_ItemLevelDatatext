@@ -1,0 +1,11 @@
+## Interface: 110002
+## LoadOnDemand: 1
+## Title: Lib: EasyMenu-1.0
+## Notes: A library for creating and managing dropdown menus in World of Warcraft addons. Simplifies menu construction, appearance customization, and user interaction handling.
+## Author: Kkthnx
+## X-Website: https://github.com/Kkthnx-Wow/LibEasyMenu
+## X-Category: Library
+## X-License: BSD-2.0
+
+LibStub/LibStub.lua
+LibEasyMenu.lua
