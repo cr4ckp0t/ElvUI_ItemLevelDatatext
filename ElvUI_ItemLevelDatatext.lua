@@ -8,7 +8,14 @@ local EP = E.Libs.EP
 local ACH = E.Libs.ACH
 local EasyMenu = LibStub("LibEasyMenu-1.0")
 
+local _G = _G
+
 -- local api cache
+local LoadAddOn = C_AddOns.LoadAddOn
+local C_ClassTalents_GetConfigIDsBySpecID = C_ClassTalents.GetConfigIDsBySpecID
+local C_ClassTalents_GetHasStarterBuild = C_ClassTalents.GetHasStarterBuild
+local C_ClassTalents_GetLastSelectedSavedConfigID = C_ClassTalents.GetLastSelectedSavedConfigID
+local C_ClassTalents_GetStarterBuildActive = C_ClassTalents.GetStarterBuildActive
 local C_EquipmentSet_GetEquipmentSetInfo = C_EquipmentSet.GetEquipmentSetInfo
 local C_EquipmentSet_ModifyEquipmentSet = C_EquipmentSet.ModifyEquipmentSet
 local C_EquipmentSet_DeleteEquipmentSet = C_EquipmentSet.DeleteEquipmentSet
@@ -16,26 +23,36 @@ local C_EquipmentSet_GetNumEquipmentSets = C_EquipmentSet.GetNumEquipmentSets
 local C_EquipmentSet_GetEquipmentSetID = C_EquipmentSet.GetEquipmentSetID
 local C_EquipmentSet_UseEquipmentSet = C_EquipmentSet.UseEquipmentSet
 local C_EquipmentSet_SaveEquipmentSet = C_EquipmentSet.SaveEquipmentSet
---local EasyMenu = _G["EasyMenu"]
-local GetAverageItemLevel = _G["GetAverageItemLevel"]
-local GetDetailedItemLevelInfo = _G["GetDetailedItemLevelInfo"]
-local GetInventoryItemID = _G["GetInventoryItemID"]
-local GetInventoryItemLink = _G["GetInventoryItemLink"]
-local GetInventoryItemTexture = _G["GetInventoryItemTexture"]
-local GetItemInfo = _G["GetItemInfo"]
-local GetItemQualityColor = _G["GetItemQualityColor"]
-local gsub = string.gsub
-local IsShiftKeyDown = _G["IsShiftKeyDown"]
-local IsControlKeyDown = _G["IsControlKeyDown"]
-local IsAltKeyDown = _G["IsAltKeyDown"]
-local StaticPopup_Show = _G["StaticPopup_Show"]
-local ToggleCharacter = _G["ToggleCharacter"]
-local unpack = _G["unpack"]
+local C_Traits_GetConfigInfo = C_Traits.GetConfigInfo
+local PlayerUtil_CanUseClassTalents = PlayerUtil.CanUseClassTalents
+local PlayerUtil_GetCurrentSpecID = PlayerUtil.GetCurrentSpecID
 
-local join = string.join
-local floor = math.floor
-local format = string.format
+local GetAverageItemLevel = GetAverageItemLevel
+local GetDetailedItemLevelInfo = GetDetailedItemLevelInfo
+local GetInventoryItemID = GetInventoryItemID
+local GetInventoryItemLink = GetInventoryItemLink
+local GetInventoryItemTexture = GetInventoryItemTexture
+local GetItemInfo = GetItemInfo
+local GetItemQualityColor = GetItemQualityColor
+local GetSpecialization = GetSpecialization
+local IsShiftKeyDown = IsShiftKeyDown
+local IsControlKeyDown = IsControlKeyDown
+local IsAltKeyDown = IsAltKeyDown
+local StaticPopup_Show = StaticPopup_Show
+local ToggleCharacter = ToggleCharacter
 
+local floor = floor
+local format = format
+local gsub = gsub
+local next = next
+local strjoin = strjoin
+local tinsert = tinsert
+local unpack = unpack
+
+local STARTER_ID = Constants.TraitConsts.STARTER_BUILD_TRAIT_CONFIG_ID
+local STARTER_TEXT = E:RGBToHex(BLUE_FONT_COLOR.r, BLUE_FONT_COLOR.g, BLUE_FONT_COLOR.b, nil, _G.TALENT_FRAME_DROP_DOWN_STARTER_BUILD)
+
+local lastSelectedId, specId
 local maxEquipmentSets = 10
 local displayString = ""
 local hexColor = ""
@@ -56,7 +73,6 @@ local slots = {
 	[15] = L["Back"],
 	[16] = L["Main Hand"],
 	[17] = L["Off Hand"]
-	--[18] = L["Ranged"],
 }
 
 -- for drop down menu
@@ -131,6 +147,32 @@ StaticPopupDialogs["ILDT_DELETE"] = {
 	end
 }
 
+local function starter_checked()
+	return C_ClassTalents_GetStarterBuildActive()
+end
+
+local function loadout_checked(data)
+	return data and data.arg1 == lastSelectedId
+end
+
+local loadout_func
+do
+	local loadoutId
+	local function loadout_callback(_, configId)
+		return configId == loadoutId
+	end
+
+	loadout_func = function(_, arg1)
+		if not _G.PlayerSpellsFrame then
+			_G.PlayerSpellsFrame_LoadUI()
+		end
+
+		loadoutId = arg1
+
+		_G.PlayerSpellsFrame.TalentsFrame:LoadConfigByPredicate(loadout_callback)
+	end
+end
+
 -- rounds a number for printing
 local function DecRound(num, decPlaces)
 	return format("%." .. (decPlaces or 0) .. "f", num)
@@ -176,6 +218,8 @@ end
 local function OnEvent(self, event)
 	local total, equipped = GetAverageItemLevel()
 	self.text:SetFormattedText(displayString, L["Item Level"], E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision))
+	specId = PlayerUtil_GetCurrentSpecID()
+	lastSelectedId = C_ClassTalents_GetLastSelectedSavedConfigID(specId)
 end
 
 local function OnEnter(self)
@@ -195,62 +239,105 @@ local function OnEnter(self)
 	if C_EquipmentSet_GetNumEquipmentSets() > 0 then
 		DT.tooltip:AddDoubleLine(L["Equipment Set"], GetEquippedSet(), 1, 1, 1, nil, nil, nil)
 	end
+	if E.db.ilvldt.showTalentBuild then
+		local configInfo = C_Traits_GetConfigInfo(lastSelectedId)
+		if configInfo then
+			DT.tooltip:AddDoubleLine(L["Active Talent Build"], configInfo.name, 1, 1, 1, nil, nil, nil)
+		end
+	end
 	DT.tooltip:AddLine(" ")
 	DT.tooltip:AddDoubleLine(L["Left Click"], L["Open Character Pane"], 1, 1, 1, nil, nil, nil)
 	DT.tooltip:AddDoubleLine(L["Right Click"], L["Change Equipment Set"], 1, 1, 1, nil, nil, nil)
+	DT.tooltip:AddDoubleLine(L["Shift + Left Click"], L["Open Talent Pane"], 1, 1, 1, nil, nil, nil)
+	DT.tooltip:AddDoubleLine(L["Shift + Right Click"], L["Change Talent Build"], 1, 1, 1, nil, nil, nil)
 	DT.tooltip:Show()
 end
 
 local function OnClick(self, button)
+	if not _G.ClassTalentFrame then
+		LoadAddOn('Blizzard_ClassTalentUI')
+	end
+
 	if button == "LeftButton" then
-		ToggleCharacter("PaperDollFrame")
-	elseif button == "RightButton" then
-		DT.tooltip:Hide()
-
-		local menuList = {{text = L["Choose Equipment Set"], isTitle = true, notCheckable = true}}
-		local numSets = C_EquipmentSet_GetNumEquipmentSets()
-		local color = "ffffff"
-
-		if not numSets or tonumber(numSets) == 0 then
-			menuList[#menuList + 1] = {text = ("|cffff0000%s|r"):format(L["No Equipment Sets"]), notCheckable = true}
+		if not IsShiftKeyDown() then
+			ToggleCharacter("PaperDollFrame")
 		else
-			for i = 0, maxEquipmentSets do
-				local name, _, _, isEquipped, _, _, _, missing, _ = C_EquipmentSet_GetEquipmentSetInfo(i)
-				if name then
-					if missing > 0 then
-						color = "|cffff0000"
-					else
-						color = isEquipped == true and hexColor or "|cffffffff"
+			if not E:AlertCombat() then
+				TogglePlayerSpellsFrame(_G.PlayerSpellsMicroButton.suggestedTab)
+			end
+		end
+	elseif button == "RightButton" then
+		local menuList = {}
+		DT.tooltip:Hide()
+		if not IsShiftKeyDown() then
+			menuList = {{text = L["Choose Equipment Set"], isTitle = true, notCheckable = true}}
+			local numSets = C_EquipmentSet_GetNumEquipmentSets()
+			local color = "ffffff"
+
+			if not numSets or tonumber(numSets) == 0 then
+				menuList[#menuList + 1] = {text = ("|cffff0000%s|r"):format(L["No Equipment Sets"]), notCheckable = true}
+			else
+				for i = 0, maxEquipmentSets do
+					local name, _, _, isEquipped, _, _, _, missing, _ = C_EquipmentSet_GetEquipmentSetInfo(i)
+					if name then
+						if missing > 0 then
+							color = "|cffff0000"
+						else
+							color = isEquipped == true and hexColor or "|cffffffff"
+						end
+
+						menuList[#menuList + 1] = {
+							text = strjoin("", " ", ("%s%s|r"):format(color, name)),
+							func = EquipmentSetClick,
+							arg1 = name,
+							checked = isEquipped == true and true or false
+						}
+					end
+				end
+
+				-- add a hint
+				menuList[#menuList + 1] = {
+					text = L["Shift + Click to Rename"],
+					isTitle = true,
+					notCheckable = true,
+					notClickable = true
+				}
+				menuList[#menuList + 1] = {
+					text = L["Ctrl + Click to Save"],
+					isTitle = true,
+					notCheckable = true,
+					notClickable = true
+				}
+				menuList[#menuList + 1] = {
+					text = L["Alt + Click to Delete"],
+					isTitle = true,
+					notCheckable = true,
+					notClickable = true
+				}
+			end
+		else
+			if specId then
+				local builds = C_ClassTalents_GetConfigIDsBySpecID(specId)
+				if builds then
+					if C_ClassTalents_GetHasStarterBuild() then
+						tinsert(builds, STARTER_ID)
 					end
 
-					menuList[#menuList + 1] = {
-						text = ("%s%s|r"):format(color, name),
-						func = EquipmentSetClick,
-						arg1 = name,
-						checked = isEquipped == true and true or false
-					}
+					menuList = {{text = L["Choose Talent Build"], isTitle = true, notCheckable = true}}
+					for index, configId in next, builds do
+						if configId == STARTER_ID then
+							menuList[index + 1] = { text = strjoin("", " ", STARTER_TEXT), checked = starter_checked, func = loadout_func, arg1 = STARTER_ID }
+						else
+							local configInfo = C_Traits_GetConfigInfo(configId)
+							menuList[index + 1] = { text = strjoin("", " ", configInfo and configInfo.name or UNKNOWN), checked = loadout_checked, func = loadout_func, arg1 = configId }
+						end
+					end
+				else
+					menuList = {{text = L["No talent builds found."], isTitle = true, notCheckable = true}}
 				end
+			else
+				menuList = {{text = L["Failed to load Talent Builds"], isTitle = true, notCheckable = true}}
 			end
-
-			-- add a hint
-			menuList[#menuList + 1] = {
-				text = L["Shift + Click to Rename"],
-				isTitle = true,
-				notCheckable = true,
-				notClickable = true
-			}
-			menuList[#menuList + 1] = {
-				text = L["Ctrl + Click to Save"],
-				isTitle = true,
-				notCheckable = true,
-				notClickable = true
-			}
-			menuList[#menuList + 1] = {
-				text = L["Alt + Click to Delete"],
-				isTitle = true,
-				notCheckable = true,
-				notClickable = true
-			}
 		end
 		EasyMenu.Create(menuList, menuFrame, "cursor", 0, 0, "MENU", 2)
 	end
@@ -272,7 +359,7 @@ local function OnUpdate(self, elapsed)
 end
 
 local function ValueColorUpdate(self, hex, r, g, b)
-	displayString = join("", "|cffffffff%s:|r", " ", hex, "%s|r")
+	displayString = strjoin("", "|cffffffff%s:|r", " ", hex, "%s|r")
 	hexColor = hex or "ffffff"
 	OnEvent(self)
 end
@@ -280,7 +367,8 @@ end
 P["ilvldt"] = {
 	["ilvl"] = "equip",
 	["precision"] = 2,
-	["showItem"] = true
+	["showItem"] = true,
+	["showTalentBuild"] = true,
 }
 
 local function InjectOptions()
@@ -295,7 +383,8 @@ local function InjectOptions()
 	E.Options.args.Crackpotx.args.ilvldt.args.ilvl = ACH:Select(L["iLvl Display"], L["Select which item level you want to display in the datatext, total or equipped."], 1, { ["equip"] = L["Equipped"], ["total"] = L["Total"] })
 	E.Options.args.Crackpotx.args.ilvldt.args.precision = ACH:Range(L["Precision"], L["Number of decimal places to round to for the average item level."], 2, { min = 0, max = 5, step = 1 })
 	E.Options.args.Crackpotx.args.ilvldt.args.showItem = ACH:Toggle(L["Show Item Name"], L["Show item name in the tooltip."], 3)
+	E.Options.args.Crackpotx.args.ilvldt.args.showTalentBuild = ACH:Toggle(L["Show Talent Build"], L["Show talent build in the tooltip."], 4)
 end
 
 EP:RegisterPlugin(..., InjectOptions)
-DT:RegisterDatatext(L["Item Level (Improved)"], nil, {"PLAYER_ENTERING_WORLD"}, OnEvent, OnUpdate, OnClick, OnEnter, nil, L["Item Level (Improved)"], nil, ValueColorUpdate)
+DT:RegisterDatatext(L["Item Level (Improved)"], nil, {"PLAYER_ENTERING_WORLD", "PLAYER_TALENT_UPDATE", "ACTIVE_TALENT_GROUP_CHANGED", "PLAYER_LOOT_SPEC_UPDATED", "TRAIT_CONFIG_DELETED", "TRAIT_CONFIG_UPDATED"}, OnEvent, OnUpdate, OnClick, OnEnter, nil, L["Item Level (Improved)"], nil, ValueColorUpdate)
