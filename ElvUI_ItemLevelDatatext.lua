@@ -12,10 +12,11 @@ local _G = _G
 
 -- local api cache
 local LoadAddOn = C_AddOns.LoadAddOn
-local C_ClassTalents_GetConfigIDsBySpecID = C_ClassTalents.GetConfigIDsBySpecID
-local C_ClassTalents_GetHasStarterBuild = C_ClassTalents.GetHasStarterBuild
-local C_ClassTalents_GetLastSelectedSavedConfigID = C_ClassTalents.GetLastSelectedSavedConfigID
-local C_ClassTalents_GetStarterBuildActive = C_ClassTalents.GetStarterBuildActive
+local C_ClassTalents_GetActiveConfigID = C_ClassTalents and C_ClassTalents.GetActiveConfigID
+local C_ClassTalents_GetConfigIDsBySpecID = C_ClassTalents and C_ClassTalents.GetConfigIDsBySpecID
+local C_ClassTalents_GetHasStarterBuild = C_ClassTalents and C_ClassTalents.GetHasStarterBuild
+local C_ClassTalents_GetLastSelectedSavedConfigID = C_ClassTalents and C_ClassTalents.GetLastSelectedSavedConfigID
+local C_ClassTalents_GetStarterBuildActive = C_ClassTalents and C_ClassTalents.GetStarterBuildActive
 local C_EquipmentSet_GetEquipmentSetInfo = C_EquipmentSet.GetEquipmentSetInfo
 local C_EquipmentSet_ModifyEquipmentSet = C_EquipmentSet.ModifyEquipmentSet
 local C_EquipmentSet_DeleteEquipmentSet = C_EquipmentSet.DeleteEquipmentSet
@@ -219,7 +220,9 @@ local function OnEvent(self, event)
 	local total, equipped = GetAverageItemLevel()
 	self.text:SetFormattedText(displayString, L["Item Level"], E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision))
 	specId = PlayerUtil_GetCurrentSpecID()
-	lastSelectedId = C_ClassTalents_GetLastSelectedSavedConfigID(specId)
+	if specId then 
+		lastSelectedId = C_ClassTalents_GetLastSelectedSavedConfigID(specId) or C_ClassTalents_GetActiveConfigID()
+	end
 end
 
 local function OnEnter(self)
@@ -355,6 +358,11 @@ local function OnUpdate(self, elapsed)
 		self.lastUpdate = 0
 		local total, equipped = GetAverageItemLevel()
 		self.text:SetFormattedText(displayString, L["Item Level"], E.db.ilvldt.ilvl == "equip" and DecRound(equipped, E.db.ilvldt.precision) or DecRound(total, E.db.ilvldt.precision))
+		
+		specId = PlayerUtil_GetCurrentSpecID()
+		if specId then 
+			lastSelectedId = C_ClassTalents_GetLastSelectedSavedConfigID(specId) or C_ClassTalents_GetActiveConfigID()
+		end
 	end
 end
 
@@ -387,4 +395,4 @@ local function InjectOptions()
 end
 
 EP:RegisterPlugin(..., InjectOptions)
-DT:RegisterDatatext(L["Item Level (Improved)"], nil, {"PLAYER_ENTERING_WORLD", "PLAYER_TALENT_UPDATE", "ACTIVE_TALENT_GROUP_CHANGED", "PLAYER_LOOT_SPEC_UPDATED", "TRAIT_CONFIG_DELETED", "TRAIT_CONFIG_UPDATED"}, OnEvent, OnUpdate, OnClick, OnEnter, nil, L["Item Level (Improved)"], nil, ValueColorUpdate)
+DT:RegisterDatatext(L["Item Level (Improved)"], nil, {"PLAYER_ENTERING_WORLD", "ELVUI_FORCE_UPDATE", "PLAYER_TALENT_UPDATE", "ACTIVE_TALENT_GROUP_CHANGED", "PLAYER_LOOT_SPEC_UPDATED", "TRAIT_CONFIG_DELETED", "TRAIT_CONFIG_UPDATED"}, OnEvent, OnUpdate, OnClick, OnEnter, nil, L["Item Level (Improved)"], nil, ValueColorUpdate)

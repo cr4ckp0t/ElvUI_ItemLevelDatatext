@@ -2,7 +2,7 @@
 ## Author: Crackpot
 ## Title: ElvUI Item Level Datatext
 ## IconTexture: Interface\AddOns\ElvUI_ItemLevelDatatext\Media\crackpot
-## Version: 3.4.0
+## Version: 3.4.1
 ## Notes: Simple datatext to show your character's item level.
 ## RequiredDeps: ElvUI
 
