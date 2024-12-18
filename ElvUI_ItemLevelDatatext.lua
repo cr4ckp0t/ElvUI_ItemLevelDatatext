@@ -242,7 +242,7 @@ local function OnEnter(self)
 	if C_EquipmentSet_GetNumEquipmentSets() > 0 then
 		DT.tooltip:AddDoubleLine(L["Equipment Set"], GetEquippedSet(), 1, 1, 1, nil, nil, nil)
 	end
-	if E.db.ilvldt.showTalentBuild then
+	if PlayerUtil_CanUseClassTalents and E.db.ilvldt.showTalentBuild then
 		local configInfo = C_Traits_GetConfigInfo(lastSelectedId)
 		if configInfo then
 			DT.tooltip:AddDoubleLine(L["Active Talent Build"], configInfo.name, 1, 1, 1, nil, nil, nil)
@@ -319,7 +319,7 @@ local function OnClick(self, button)
 				}
 			end
 		else
-			if specId then
+			if PlayerUtil_CanUseClassTalents and specId then
 				local builds = C_ClassTalents_GetConfigIDsBySpecID(specId)
 				if builds then
 					if C_ClassTalents_GetHasStarterBuild() then
@@ -376,7 +376,7 @@ P["ilvldt"] = {
 	["ilvl"] = "equip",
 	["precision"] = 2,
 	["showItem"] = true,
-	["showTalentBuild"] = true,
+	["showTalentBuild"] = false,
 }
 
 local function InjectOptions()
