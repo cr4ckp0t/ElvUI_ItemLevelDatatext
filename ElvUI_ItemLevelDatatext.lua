@@ -249,9 +249,9 @@ local function OnEnter(self)
 		end
 	end
 	DT.tooltip:AddLine(" ")
-	DT.tooltip:AddDoubleLine(L["Left Click"], L["Open Character Pane"], 1, 1, 1, nil, nil, nil)
+	DT.tooltip:AddDoubleLine(L["Left Click"], L["Open Character Panel"], 1, 1, 1, nil, nil, nil)
 	DT.tooltip:AddDoubleLine(L["Right Click"], L["Change Equipment Set"], 1, 1, 1, nil, nil, nil)
-	DT.tooltip:AddDoubleLine(L["Shift + Left Click"], L["Open Talent Pane"], 1, 1, 1, nil, nil, nil)
+	DT.tooltip:AddDoubleLine(L["Shift + Left Click"], L["Open Talent Panel"], 1, 1, 1, nil, nil, nil)
 	DT.tooltip:AddDoubleLine(L["Shift + Right Click"], L["Change Talent Build"], 1, 1, 1, nil, nil, nil)
 	DT.tooltip:Show()
 end
